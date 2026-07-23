@@ -6,4 +6,6 @@ Application URL: http://127.0.0.1:5009
 
 **Note:** Due to the nature of the vulnerability, CTF is not designed for this category. You may use the predefined prompts and observe model hallucinate and provide misinformation
 
+This challenge uses the local `mistral` model configured in the project
+README. It does not require Box credentials or environment variables.
 

@@ -27,9 +27,6 @@ Flask-WTF==1.2.2
 pypdf==5.4.0
 
 # Utilities
-boxsdk==3.14.0
-chardet==5.2.0
 python-dateutil==2.9.0.post0
-python-dotenv==1.1.0
 psutil
 email_validator
