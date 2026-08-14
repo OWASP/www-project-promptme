@@ -2,3 +2,8 @@
 /Gemfile.lock
 /favicon.ico
 _site/
+.venv/
+*.log
+/logs/
+__pycache__/
+*.pyc
