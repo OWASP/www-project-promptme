@@ -33,7 +33,7 @@ This guide provides instructions for setting up and running the challenges.
 
 #### 2. Go to challenge directory.
 > ```
-> cd PromptMe
+> cd www-project-promptme
 > ```
 
 #### 3. Install the dependencies.
