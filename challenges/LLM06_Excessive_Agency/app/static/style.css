@@ -98,6 +98,7 @@ input {
 
 button {
     padding: 8px 12px;
+    margin-left: 8px;
     background: #007BFF;
     color: white;
     border: none;
@@ -114,5 +115,35 @@ button:hover {
     color: #888;
     display: flex;
     align-items: center;
+}
+
+.flag-container {
+    width: 35%;
+    margin: 20px auto;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1B3A1E;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.flag-header {
+    background: #4CAF50;
+    color: #1E1E2D;
+    margin: 0;
+    padding: 10px;
+}
+
+.flag-result {
+    padding: 10px;
+    font-weight: bold;
+}
+
+.flag-success {
+    color: #4CAF50;
+}
+
+.flag-fail {
+    color: #FF5252;
 }
 

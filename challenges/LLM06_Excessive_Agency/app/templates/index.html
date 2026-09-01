@@ -37,6 +37,36 @@
 
             userInput.value = ""; // Clear input field
         }
+
+        function submitFlag() {
+            const flagInput = document.getElementById("flag-input");
+            const flagResult = document.getElementById("flag-result");
+            const waitIcon = document.getElementById("flag-wait");
+
+            // Show wait icon
+            waitIcon.style.display = 'block';
+            flagResult.textContent = "";
+
+            // Wait for half a second, then submit
+            setTimeout(() => {
+                fetch("/submit-flag", {
+                    method: "POST",
+                    body: JSON.stringify({ flag: flagInput.value }),
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    waitIcon.style.display = 'none';
+                    if (data.status === "success") {
+                        flagResult.textContent = "🎉 Congratulations! Correct flag!";
+                        flagResult.className = "flag-result flag-success";
+                    } else {
+                        flagResult.textContent = "❌ Try again.";
+                        flagResult.className = "flag-result flag-fail";
+                    }
+                });
+            }, 300);
+        }
     </script>
 </head>
 <body>
@@ -54,6 +84,15 @@
             <input type="text" id="user-input" placeholder="Type your message...">
             <button onclick="sendMessage()">Send</button>
         </div>
+    </div>
+    <div class="flag-container">
+        <h2 class="flag-header">Submit content of flag.txt</h2>
+        <div class="input-container">
+            <input type="text" id="flag-input" placeholder="Enter the flag...">
+            <button onclick="submitFlag()">Submit</button>
+        </div>
+        <div id="flag-wait" class="flag-result" style="display: none;">⏳ Processing...</div>
+        <div id="flag-result" class="flag-result"></div>
     </div>
 </body>
 </html>
