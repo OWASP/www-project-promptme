@@ -67,6 +67,20 @@
                 });
             }, 300);
         }
+
+        function handleUserInputKeydown(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function handleFlagInputKeydown(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                submitFlag();
+            }
+        }
     </script>
 </head>
 <body>
@@ -81,14 +95,14 @@
             🤖 AI is thinking<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
         </div>
         <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message...">
+            <input type="text" id="user-input" placeholder="Type your message..." onkeydown="handleUserInputKeydown(event)">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
     <div class="flag-container">
         <h2 class="flag-header">Submit content of flag.txt</h2>
         <div class="input-container">
-            <input type="text" id="flag-input" placeholder="Enter the flag...">
+            <input type="text" id="flag-input" placeholder="Enter the flag..." onkeydown="handleFlagInputKeydown(event)">
             <button onclick="submitFlag()">Submit</button>
         </div>
         <div id="flag-wait" class="flag-result" style="display: none;">⏳ Processing...</div>
