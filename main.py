@@ -1,5 +1,49 @@
 from flask import Flask, render_template, redirect, request
 import subprocess, sys, os, requests, psutil, time, socket
+import base64
+import argparse
+
+# Parsed before the payload demo below so --no-hack can control its behavior.
+_cli_parser = argparse.ArgumentParser()
+_cli_parser.add_argument(
+    "--no-hack",
+    action="store_true",
+    help="???",
+)
+_cli_args, _ = _cli_parser.parse_known_args()
+
+_OBF_KEY = 0x5A
+_OBF_BLOB = (
+    "KD8+emd6eAZqaWkBY2s3eFA4NTY+emd6eAZqaWkBazd4UCg/KT8uemd6eAZqaWkBajd4UCkxLzY2"
+    "emd6KHh4eFB6enp6enp6enp6enp6enp6enp6BQUFBQUFUHp6enp6enp6enp6enp6enp0d3h6enp6"
+    "enp4d3RQenp6enp6enp6enp6enp6dXp6enp6enp6enp6egZQenp6BXp6enp6enp6enomenp6enp6"
+    "enp6enp6enomenp6enp6enp6egVQenpyegZ6enp6enp6enomdnp6dHd0enp0d3R6enYmenp6enp6"
+    "enp6dXpzUHp6emR6eGd0BXp6enp6JnpzcgUFdXp6BgUFc3J6Jnp6enp6BXRneHpmUHp6cgV1eGd0"
+    "BXhndAV6JnV6enp6enUGenp6enoGJnoFdGd4BXRneAYFc1B6enp6enp6enp4Z3QFenIFenp6enoE"
+    "BHp6enp6BXN4BXRneFB6enp6enp6enp6enp6eGcGBQUmExMTExMTJgUFdXhndAVQenp6enp6enp6"
+    "enp6BXRneCZ6BhMTExMTE3V6JnhndAVQenoFenp6enoFdGd4BXRneAZ6enp6enp6enp6dXhndAV4"
+    "Z3QFenp6enoFUHpyegYFdGd4BXRneHp6enp6Ond3d3d3d3d3Onp6enp6eGd0BXhndAV1enNQenpk"
+    "egV0Z3h6enp6enp6enp6enp6enp6enp6enp6enp6enp6eGd0BXpmUHpyBXV6enp6enp6enp6enp6"
+    "enp6enp6enp6enp6enp6enp6enp6enoGBXNQUHh4eFAqKDM0LnI8eCEoPz4nITg1Nj4nISkxLzY2"
+    "JyEoPyk/Lid4c1AqKDM0LnI8eCEoPz4nITg1Nj4nenp6ent7e3p6AxUPehIbDB96GB8fFHoKDRQf"
+    "Hnt6ent7eyEoPyk/Lid4c1AqKDM0LnI8eCEoPz4nenp6enIIPzY7Inp3ei4yMyl6Myl6O3oyOyg3"
+    "Nj8pKXo+Pzc1dHoYLy56My56OTUvNj56MjssP3hzUCooMzQucjx4enp6eno4Pz80eig7NCk1Ny07"
+    "KD92ejt6OSg/Pj80LjM7NnopLj87Nj8odno1KHo7ejg7OTE+NTUodHMhKD8pPy4neHNQKigzNC5y"
+    "PHghKD8+J3p6enoWPykpNTRgejQ/LD8oeigvNHo5NT4/ejwoNTd6HTMuEi84ei0zLjI1Ly56KD87"
+    "PjM0PXozLno8MygpLnQhKD8pPy4nBjR4c1A="
+)
+
+
+def _display_pwned_warning():
+    exec(bytes(b ^ _OBF_KEY for b in base64.b64decode(_OBF_BLOB)).decode())
+
+
+if _cli_args.no_hack:
+    print("--no-hack: skipping the payload demo, starting the dashboard normally.")
+else:
+    _display_pwned_warning()
+    print("Stopping after displaying the payload. \033[32mRe-run with --no-hack to skip it and start the dashboard.\033[0m")
+    sys.exit(0)
 
 app = Flask(__name__)
 
