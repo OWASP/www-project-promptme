@@ -68,6 +68,14 @@ Access the application @ http://127.0.0.1:5000
 
 #### 6. Start the challenge by clicking *start* button on particular category e.g. LLM01
 
+### Tests
+
+Run the challenge regression tests with:
+
+```shell
+python -m pytest -q
+```
+
 ## Compatibility 
 
 This project currently supports macOS and Linux systems. Windows compatibility is in progress and will be released in an upcoming update.
@@ -99,6 +107,5 @@ If you're interested in contributing:
     Make your changes and commit them.
 
     Push to your fork and create a Pull Request.
-
 
 

@@ -12,4 +12,6 @@ Application URL: http://127.0.0.1:5006
 
 **Hint:** Only authorised users can access restricted folders
 
+The challenge file store is included in this directory, so no Box account,
+API key, or environment variables are required.
 

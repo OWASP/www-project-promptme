@@ -1,128 +1,82 @@
-import os
-from boxsdk import OAuth2, Client, JWTAuth
-import chardet
+"""Local file store used by the LLM06 challenge.
 
-config_path = os.path.abspath('challenges/LLM06_Excessive_Agency/app/utils/llm06_2025_utils/box_config.json')
-if not os.path.exists(config_path):
-    raise FileNotFoundError(f"Config file not found at {config_path}")
+The challenge used to depend on a single Box account whose credentials and
+folder IDs were committed to the repository.  Besides exposing credentials,
+that made every checkout stop working when the account changed.  These
+helpers retain the small interface used by the challenge while keeping its
+public and restricted files in the repository.
+"""
 
-print(f"Config path (absolute): {config_path}")
-print("Config file exists:", os.path.exists(config_path))
-print("Current Working Directory:", os.getcwd())
+from pathlib import Path
 
-config = JWTAuth.from_settings_file(config_path)
-client = Client(config)
+DATA_ROOT = Path(__file__).with_name("data")
+FOLDERS = {
+    "all": DATA_ROOT,
+    "accessible": DATA_ROOT / "accessible",
+    "restricted": DATA_ROOT / "restricted",
+    "logs": DATA_ROOT / "logs",
+}
 
-WHOLE_BOX_FOLDER_ID = os.getenv('WHOLE_BOX_FOLDER_ID')
+
+def _folder(folder_id):
+    folder_key = folder_id or "all"
+    try:
+        return FOLDERS[folder_key]
+    except KeyError as exc:
+        raise ValueError(f"Unknown challenge folder: {folder_key}") from exc
+
 
 def search_file_recursive(folder_id, file_name):
-    found_file = False
-    file_id = ""
-    file_content = "File not found in the accessible folder."
-    if folder_id == None:
-        folder_id = WHOLE_BOX_FOLDER_ID
+    """Return the first matching file below a challenge folder."""
+    if not file_name:
+        return False, "", "File not found in the accessible folder."
 
-    folder = client.folder(folder_id)
-    # Get items in the folder
-    items = folder.get_items()
+    requested_name = Path(file_name).name.casefold()
+    for path in _folder(folder_id).rglob("*"):
+        if path.is_file() and path.name.casefold() == requested_name:
+            return True, str(path.relative_to(DATA_ROOT)), path.read_text()
 
-    for item in items:
-        if item.type == "file" and item.name.lower() == file_name.lower():
-            # print(f"✅ File found: {item.name} (ID: {item.id}) in {folder.name}")
-            found_file = True
-            file_id = item.id
-            file_content = client.file(item.id).content()
-            result = chardet.detect(file_content[:1000])  # check first 10 KB
-            encoding = result['encoding']
-            if encoding == None:
-                encoding = 'utf-8'
-            return found_file, file_id, file_content.decode(encoding)
-        elif item.type == "folder":
-            # Recursively search in subfolder
-            found_file, file_id, file_content = search_file_recursive(item.id, file_name)
-            if found_file:
-                return found_file, file_id, file_content  # Return immediately if found
-    
-    return found_file, file_id, file_content
+    return False, "", "File not found in the accessible folder."
+
+
+def _list_folder(path):
+    content = {}
+    for item in sorted(path.iterdir()):
+        if item.is_file():
+            content.setdefault(path.name, []).append(item.name)
+        elif item.is_dir():
+            content[item.name] = _list_folder(item)
+    content.setdefault(path.name, [])
+    return content
+
 
 def list_all_files(folder_id):
-    folder_content = {}
-    if folder_id == None:
-        return folder_content
-    else:
-        if folder_id != WHOLE_BOX_FOLDER_ID:
-            root_folder = client.folder(WHOLE_BOX_FOLDER_ID)
-            # Get folder information
-            root_folder_info = root_folder.get()
+    """List files below a challenge folder without crossing its boundary."""
+    return _list_folder(_folder(folder_id))
 
-            # Access the folder name
-            root_folder_name = root_folder_info.name
-            folder_content[root_folder_name] = []
-            
-        folder = client.folder(folder_id)
-        # Get folder information
-        folder_info = folder.get()
-
-        # Access the folder name
-        folder_name = folder_info.name
-
-        folder_content[folder_name] = []
-        # Get items in the folder
-        items = folder.get_items()
-        for item in items:
-            if item.type == "file":
-                folder_content[folder_name].append(item.name)
-            elif item.type == "folder":
-                # Recursively search in subfolder
-                nested_folder_content = list_all_files(item.id)
-                folder_content[folder_name+"/"+item.name] = nested_folder_content[item.name]
-
-        return folder_content
 
 def create_file(folder_id, filename, content):
-    """Create a new file in the Box CTF folder."""
-    try:
-        file_path = f"/tmp/{filename}"  # Temporary file for upload
-        with open(file_path, "w") as f:
-            f.write(content)
-
-        folder = client.folder(folder_id)
-        uploaded_file = folder.upload(file_path, file_name=filename)
-        os.remove(file_path)  # Cleanup temp file
-        return f"✅ File '{filename}' created successfully (ID: {uploaded_file.id})"
-    except Exception as e:
-        return f"❌ Error creating file: {e}"
+    """Create a file in a challenge folder."""
+    path = _folder(folder_id) / Path(filename).name
+    if path.exists():
+        return f"❌ Error creating file: '{path.name}' already exists"
+    path.write_text(content)
+    return f"✅ File '{path.name}' created successfully"
 
 
 def update_file(folder_id, file_name, new_content):
-    """Update an existing file in the Box CTF folder."""
-    found_file, file_id, file_content = search_file_recursive(folder_id, file_name)
-    if found_file:
-        try:
-            file = client.file(file_id).get()
-            file_path = f"/tmp/{file.name}"
-            
-            with open(file_path, "w") as f:
-                f.write(new_content)
-
-            updated_file = file.update_contents(file_path)
-            os.remove(file_path)  # Cleanup temp file
-            return f"✅ File '{file.name}' updated successfully"
-        except Exception as e:
-            return f"❌ Error updating file: {e}"
-    else:
-        return f"❌ File not found"
+    """Update the first matching file in a challenge folder."""
+    found, file_id, _ = search_file_recursive(folder_id, file_name)
+    if not found:
+        return "❌ File not found"
+    (DATA_ROOT / file_id).write_text(new_content)
+    return f"✅ File '{Path(file_id).name}' updated successfully"
 
 
 def delete_file(folder_id, file_name):
-    """Delete a file from the Box CTF folder."""
-    found_file, file_id, file_content = search_file_recursive(folder_id, file_name)
-    if found_file:
-        try:
-            file = client.file(file_id)
-            file.delete()
-            return f"✅ File (ID: {file_id}) deleted successfully"
-        except Exception as e:
-            return f"❌ Error deleting file: {e}"
-    else:
-        return f"❌ File not found"
+    """Delete the first matching file in a challenge folder."""
+    found, file_id, _ = search_file_recursive(folder_id, file_name)
+    if not found:
+        return "❌ File not found"
+    (DATA_ROOT / file_id).unlink()
+    return f"✅ File (ID: {file_id}) deleted successfully"

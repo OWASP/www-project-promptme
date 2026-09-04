@@ -1,0 +1,3 @@
+Welcome to the PromptMe file manager.
+
+This folder contains files available to regular users.
