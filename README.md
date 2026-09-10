@@ -86,7 +86,7 @@ This project currently supports macOS and Linux systems. Windows compatibility i
 
 ## Connect
 
-If you face any challenges in setup, solving or any suggestions, please reach out to https://discord.gg/BKTuUfhB
+If you face any challenges in setup, solving or any suggestions, please reach out to [https://discord.gg/CYnjfxNhgU](https://discord.gg/CYnjfxNhgU)
 
 
 ## Disclaimer
