@@ -6,7 +6,24 @@
 
 ### A vulnerable application designed to demonstrate the OWASP Top 10 for Large Language Model (LLM) Applications.
 
-PromptMe is an educational project that showcases security vulnerabilities in large language models (LLMs) and their web integrations. It includes 10 hands-on challenges inspired by the OWASP LLM Top 10, demonstrating how these vulnerabilities can be discovered and exploited in real-world scenarios.
+PromptMe is an educational project that showcases security vulnerabilities in large language models (LLMs) and their web integrations. It includes 10 hands-on challenges inspired by the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/), demonstrating how these vulnerabilities can be discovered and exploited in real-world scenarios.
+
+### Challenges
+
+Challenges follow the 2026 numbering. Each one listens on port `5000 + number` (e.g. LLM03 on 5003).
+
+| 2026 | Challenge | 2025 |
+|------|-----------|------|
+| LLM01 | [Prompt Injection](challenges/LLM01_Prompt_Injection) | LLM01 |
+| LLM02 | [Sensitive Information Disclosure](challenges/LLM02_Sensitive_Information_Disclosure) | LLM02 |
+| LLM03 | [Excessive Agency](challenges/LLM03_Excessive_Agency) | LLM06 |
+| LLM04 | [Supply Chain](challenges/LLM04_Supply_Chain) | LLM03 |
+| LLM05 | [Data and Model Poisoning](challenges/LLM05_Data_and_Model_Poisoning) | LLM04 |
+| LLM06 | [Unbounded Consumption](challenges/LLM06_Unbounded_Consumption) | LLM10 |
+| LLM07 | [Misinformation](challenges/LLM07_Misinformation) | LLM09 |
+| LLM08 | [Hidden Context Exposure](challenges/LLM08_Hidden_Context_Exposure) | LLM07 (System Prompt Leakage) |
+| LLM09 | [Vector and Embedding Weaknesses](challenges/LLM09_Vector_and_Embedding_Weaknesses) | LLM08 |
+| LLM10 | [Improper Output Handling](challenges/LLM10_Improper_Output_Handling) | LLM05 |
 
 This project is intended for AI Security professionals to explore potential security risks in LLMs and learn effective mitigation strategies.
 

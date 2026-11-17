@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LLM09: Vector and Embedding Weaknesses</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2em;
+    }
+
+    h1 {
+      margin-bottom: 1em;
+      font-size: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    input[type="text"] {
+      width: 70%;
+      padding: 12px;
+      font-size: 16px;
+      text-align: center;
+      border: 1px solid #444;
+      background-color: #222;
+      color: #0f0;
+      margin-bottom: 1em;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: crimson;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkred;
+    }
+
+    .output-container {
+      margin-top: 2em;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    textarea {
+      width: 70%;
+      height: 400px;
+      padding: 15px;
+      font-family: monospace;
+      font-size: 15px;
+      border: 1px solid #666;
+      background-color: #1a1a1a;
+      color: #0f0;
+      resize: both;
+      border-radius: 8px;
+      overflow: auto;
+    }
+
+    .nav {
+      margin-top: 2em;
+    }
+
+    .nav a {
+      color: #09f;
+      margin-right: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PromptMe</h1>
+
+  <form method="POST">
+    <input type="text" name="query" placeholder="Ask a question..." required>
+    <button type="submit">Ask</button>
+  </form>
+
+  {% if llm_response %}
+    <div class="output-container">
+      <textarea readonly id="llm-output"></textarea>
+    </div>
+  {% endif %}
+
+  <div class="nav">
+    <a href="{{ url_for('landing') }}">Back to Home</a>
+    <a href="{{ url_for('login') }}">Admin Panel</a>
+  </div>
+
+  <script>
+    const output = document.getElementById("llm-output");
+    {% if llm_response %}
+      const fullText = {{ llm_response | tojson }};
+      let i = 0;
+      output.value = "";
+
+      const interval = setInterval(() => {
+        output.value += fullText.charAt(i);
+        i++;
+        if (i >= fullText.length) {
+          clearInterval(interval);
+        }
+      }, 20);
+    {% endif %}
+  </script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OWASP LLM Top 10 Dashboard</title>
+  <title>OWASP LLM Top 10 (2026) Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
@@ -76,13 +76,13 @@
 </head>
 <body>
   <h1>PromptMe</h1>
-  <h3>OWASP LLM Top 10 CTF Challenges</h3>
+  <h3>OWASP LLM Top 10 (2026) CTF Challenges</h3>
   <div class="tiles-container">
     {% for risk in risks %}
       <div class="tile" id="tile-{{ risk.id }}">
         <div class="running-status" id="status-{{ risk.id }}">Running</div>
-        <i class="{{ risk.icon }}" style="font-size: 36px;"></i>
-        <h3>{{ risk.title }}</h3>
+        <i class="{{ risk.icon }}" style="font-size: 36px;" aria-hidden="true"></i>
+        <h3>LLM{{ '%02d' % risk.id }}: {{ risk.title }}</h3>
         <div class="control-buttons">
           <button class="start" onclick="startChallenge({{ risk.id }})">Start</button>
           <button class="stop" onclick="stopChallenge({{ risk.id }})">Stop</button>

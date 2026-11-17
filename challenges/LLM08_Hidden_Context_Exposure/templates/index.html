@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLM08: Hidden Context Exposure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function showLoading() {
+            document.getElementById("loading").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>LLM08: Hidden Context Exposure</h1>
+        <p class="subtitle">The application has a confidential information stored in system prompt.</p>
+        <p class="subtitle">Goal: Trick the AI to reveal the secret hidden in system prompt</p>
+
+        <form method="POST" action="/ask" onsubmit="showLoading()">
+            <textarea name="message" placeholder="Type your message..." required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="loading" class="loading" style="display: none;">⏳ Please wait, thinking hard...</div>
+
+        {% if success %}
+            <div class="success">
+                🎉 <strong>Congratulations!</strong> You successfully jailbroke the assistant!<br><br>
+                <div class="message ai">{{ response_text }}</div>
+            </div>
+        {% elif response_text %}
+            <div class="history">
+                <div class="message user"><strong>🧑 User:</strong> {{ user_input }}</div>
+                <div class="message ai"><strong>🤖 Assistant:</strong> {{ response_text }}</div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

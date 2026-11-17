@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM03: Excessive Agency</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function sendMessage() {
+
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+
+            if (userInput.value.trim() === "") return;
+
+            // Show typing animation
+            const typingAnimation = document.getElementById("typing");
+            typingAnimation.style.display = 'block';
+
+            // Append user message to chat box
+            const userMessage = `<pre class='message user-message'>${userInput.value}</pre>`;
+            chatBox.innerHTML += userMessage;
+
+            // Send request to Flask API
+            fetch("/llm03_2026_chat", {
+                method: "POST",
+                body: JSON.stringify({ message: userInput.value }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botMessage = `<pre class='message bot-message'>${data.reply}</pre>`;
+                chatBox.innerHTML += botMessage;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+                typingAnimation.style.display = 'none';
+            });
+
+            userInput.value = ""; // Clear input field
+        }
+    </script>
+</head>
+<body>
+    <h1>LLM03: Excessive Agency</h1>
+    <p>Interact with an LLM-powered chatbot integrated with a file management system. The system includes both public and restricted folders, with the latter accessible only to users with admin privileges.</p>
+    <p></p>
+    <p>Goal: Discover the vulnerability and manipulate the chatbot to access flag.txt, which is restricted to admin-only access.</p>
+    <div class="chat-container">
+        <h2 class="chat-header">PromptMe</h2>
+        <div class="chat-box" id="chat-box"></div>
+        <div id='typing' class='typing-message bot-message typing' style="display: none;">
+            🤖 AI is thinking<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -31,19 +31,39 @@ def start_challenge(port, app_path):
     running_apps[port] = process
 
 
+# OWASP Top 10 for LLM Applications 2026.
+# Each challenge listens on port 5000 + id.
+CHALLENGES = {
+    1:  { 'title': 'Prompt Injection',              'icon': 'fas fa-code',
+          'path': 'challenges/LLM01_Prompt_Injection/app1.py' },
+    2:  { 'title': 'Sensitive Info Disclosure',     'icon': 'fas fa-shield-alt',
+          'path': 'challenges/LLM02_Sensitive_Information_Disclosure/app2.py' },
+    3:  { 'title': 'Excessive Agency',              'icon': 'fas fa-user-secret',
+          'path': 'challenges/LLM03_Excessive_Agency/app3.py' },
+    4:  { 'title': 'Supply Chain',                  'icon': 'fas fa-shipping-fast',
+          'path': 'challenges/LLM04_Supply_Chain/app4.py' },
+    5:  { 'title': 'Data & Model Poisoning',        'icon': 'fas fa-skull',
+          'path': 'challenges/LLM05_Data_and_Model_Poisoning/app5.py' },
+    6:  { 'title': 'Unbounded Consumption',         'icon': 'fas fa-infinity',
+          'path': 'challenges/LLM06_Unbounded_Consumption/app6.py' },
+    7:  { 'title': 'Misinformation',                'icon': 'fas fa-bullhorn',
+          'path': 'challenges/LLM07_Misinformation/app7.py' },
+    8:  { 'title': 'Hidden Context Exposure',       'icon': 'fas fa-file-alt',
+          'path': 'challenges/LLM08_Hidden_Context_Exposure/app8.py' },
+    9:  { 'title': 'Vector & Embedding Weaknesses', 'icon': 'fas fa-project-diagram',
+          'path': 'challenges/LLM09_Vector_and_Embedding_Weaknesses/app9.py' },
+    10: { 'title': 'Improper Output Handling',      'icon': 'fas fa-exclamation-triangle',
+          'path': 'challenges/LLM10_Improper_Output_Handling/app10.py' },
+}
+
+def challenge_port(challenge_id):
+    return 5000 + challenge_id
+
 @app.route('/')
 def dashboard():
     risks = [
-        { 'id': 1, 'title': 'Prompt Injection', 'icon': 'fas fa-code' },
-        { 'id': 2, 'title': 'Sensitive Info Disclosure', 'icon': 'fas fa-shield-alt' },
-        { 'id': 3, 'title': 'Supply Chain', 'icon': 'fas fa-shipping-fast' },
-        { 'id': 4, 'title': 'Data & Model Poisoning', 'icon': 'fas fa-skull' },
-        { 'id': 5, 'title': 'Improper Output Handling', 'icon': 'fas fa-exclamation-triangle' },
-        { 'id': 6, 'title': 'Excessive Agency', 'icon': 'fas fa-user-secret' },
-        { 'id': 7, 'title': 'System Prompt Leakage', 'icon': 'fas fa-file-alt' },
-        { 'id': 8, 'title': 'Vector & Embedding Weaknesses','icon': 'fas fa-project-diagram' },
-        { 'id': 9, 'title': 'Misinformation', 'icon': 'fas fa-bullhorn' },
-        { 'id': 10,'title': 'Unbounded Consumption', 'icon': 'fas fa-infinity' }
+        { 'id': cid, 'title': c['title'], 'icon': c['icon'] }
+        for cid, c in sorted(CHALLENGES.items())
     ]
     return render_template('dashboard.html', risks=risks)
 
@@ -62,38 +82,10 @@ def wait_until_responsive(url, timeout=30):
 @app.route('/start/<int:challenge_id>')
 def start_challenge_route(challenge_id):
     client_host = request.host.split(":")[0]
-    if challenge_id == 1:
-        port = 5001
-        app_path = "challenges/LLM01_Prompt_Injection/app1.py"
-    elif challenge_id == 2:
-        port = 5002
-        app_path = "challenges/LLM02_Sensitive_Information_Disclosure/app2.py"
-    elif challenge_id == 3:
-        port = 5003
-        app_path = "challenges/LLM03_Supply_Chain/app3.py"
-    elif challenge_id == 4:
-        port = 5004
-        app_path = "challenges/LLM04_Data_and_Model_Poisoning/app4.py"
-    elif challenge_id == 5:
-        port = 5005
-        app_path = "challenges/LLM05_Improper_Output_Handling/app5.py"
-    elif challenge_id == 6:
-        port = 5006
-        app_path = "challenges/LLM06_Excessive_Agency/app6.py"
-    elif challenge_id == 7:
-        port = 5007
-        app_path = "challenges/LLM07_System_Prompt_Leakage/app7.py"
-    elif challenge_id == 8:
-        port = 5008
-        app_path = "challenges/LLM08_Vector_and_Embedding_Weaknesses/app8.py"
-    elif challenge_id == 9:
-        port = 5009
-        app_path = "challenges/LLM09_Misinformation/app9.py"
-    elif challenge_id == 10:
-        port = 5010
-        app_path = "challenges/LLM10_Unbounded_Consumption/app10.py"
-    else:
+    if challenge_id not in CHALLENGES:
         return "Unknown Challenge ID", 404
+    port = challenge_port(challenge_id)
+    app_path = CHALLENGES[challenge_id]['path']
 
     try:
         start_challenge(port, app_path)
@@ -109,7 +101,7 @@ def start_challenge_route(challenge_id):
 @app.route('/stop/<int:challenge_id>')
 def stop_challenge_route(challenge_id):
     global running_apps
-    port = 5000 + challenge_id
+    port = challenge_port(challenge_id)
     if port in running_apps:
         try:
             process = running_apps[port]
